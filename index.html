@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Tata AMC | Acquisition Funnel Prototype</title>
+<style>
+  :root {
+    --navy: #10243a;
+    --navy-2: #183954;
+    --teal: #11a7a0;
+    --teal-dark: #087f7a;
+    --gold: #e5b65c;
+    --ink: #172b3c;
+    --muted: #647789;
+    --line: #dce5ec;
+    --panel: #f5f8fb;
+    --white: #fff;
+    --green: #147d64;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    background: #eef3f7;
+    color: var(--ink);
+    line-height: 1.45;
+  }
+  .app { max-width: 1180px; margin: 0 auto; padding: 28px 20px 36px; }
+  .hero {
+    background: linear-gradient(125deg, var(--navy), var(--navy-2));
+    color: white; border-radius: 22px; padding: 28px 30px; position: relative; overflow: hidden;
+    box-shadow: 0 16px 40px rgba(16,36,58,.16);
+  }
+  .hero:after {
+    content: ""; position: absolute; width: 280px; height: 280px; right: -70px; top: -130px;
+    border: 1px solid rgba(255,255,255,.14); border-radius: 50%;
+    box-shadow: 0 0 0 28px rgba(255,255,255,.035), 0 0 0 58px rgba(255,255,255,.025);
+  }
+  .eyebrow { text-transform: uppercase; letter-spacing: .14em; font-size: .73rem; color: #8ee2dc; font-weight: 800; }
+  h1 { font-size: clamp(1.7rem, 4vw, 2.65rem); line-height: 1.12; margin: 10px 0 12px; max-width: 760px; }
+  .hero p { color: #d7e4ee; margin: 0; max-width: 760px; }
+  .hero-tags { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 20px; }
+  .tag { border: 1px solid rgba(255,255,255,.2); background: rgba(255,255,255,.07); border-radius: 999px; padding: 6px 10px; font-size: .78rem; color: #edf5fa; }
+  .layout { display: grid; grid-template-columns: minmax(0, .95fr) minmax(0, 1.05fr); gap: 18px; margin-top: 18px; align-items: start; }
+  .card { background: var(--white); border: 1px solid var(--line); border-radius: 18px; padding: 22px; box-shadow: 0 5px 18px rgba(25,48,68,.035); }
+  .section-title { display:flex; align-items:flex-start; justify-content:space-between; gap: 12px; margin-bottom: 18px; }
+  h2 { margin: 0; font-size: 1.13rem; color: var(--navy); }
+  .sub { color: var(--muted); font-size: .86rem; margin-top: 5px; }
+  .live { display:inline-flex; align-items:center; gap:7px; color:var(--green); background:#e7f7f2; border-radius:999px; padding:5px 9px; font-size:.72rem; font-weight:800; white-space:nowrap; }
+  .dot { width:7px; height:7px; background:#18a77d; border-radius:50%; box-shadow:0 0 0 4px rgba(24,167,125,.12); }
+  .control { padding: 15px 0; border-bottom: 1px solid #edf1f5; }
+  .control:last-of-type { border-bottom: 0; }
+  .control-head { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom: 9px; }
+  label { font-size:.88rem; font-weight:650; color:#30495e; }
+  .value { font-size:1rem; font-weight:800; color:var(--navy); font-variant-numeric:tabular-nums; }
+  input[type="range"] { width:100%; accent-color:var(--teal); cursor:pointer; }
+  .range-ends { display:flex; justify-content:space-between; font-size:.72rem; color:#8797a5; margin-top: 3px; }
+  .hint { font-size:.77rem; color:var(--muted); margin-top:7px; }
+  .results { display:grid; grid-template-columns:1fr 1fr; gap:11px; }
+  .metric { padding:17px; border-radius:14px; background:var(--panel); border:1px solid #e8eef3; min-height:108px; }
+  .metric.featured { background:#eaf8f6; border-color:#c4ece7; }
+  .metric-label { color:var(--muted); font-size:.77rem; font-weight:650; }
+  .metric-value { font-size:clamp(1.3rem, 2.7vw, 1.8rem); font-weight:850; color:var(--navy); letter-spacing:-.035em; margin-top:7px; overflow-wrap:anywhere; font-variant-numeric:tabular-nums; }
+  .metric.featured .metric-value { color:var(--teal-dark); }
+  .funnel { margin-top: 22px; }
+  .funnel-row { margin: 13px 0; }
+  .funnel-head { display:flex; justify-content:space-between; gap:10px; font-size:.82rem; margin-bottom:6px; }
+  .funnel-head strong { color:var(--navy); }
+  .bar-track { height:12px; border-radius:999px; background:#edf2f6; overflow:hidden; }
+  .bar { height:100%; width:0; border-radius:999px; background:linear-gradient(90deg,var(--teal),#67d3c6); transition:width .25s ease; }
+  .bar.reach { background:linear-gradient(90deg,var(--navy),#4e7894); }
+  .bar.qualified { background:linear-gradient(90deg,#d9a63f,var(--gold)); }
+  .bar.investors { background:linear-gradient(90deg,var(--teal-dark),#49c6b7); }
+  .divider { height:1px; background:var(--line); margin:20px 0; }
+  .insight { padding:14px 15px; border-left:4px solid var(--gold); background:#fff9ed; border-radius:0 12px 12px 0; font-size:.84rem; color:#5e4a25; }
+  .scenario-row { display:flex; flex-wrap:wrap; gap:8px; margin-top:15px; }
+  button { border:1px solid #cbd7e0; background:white; color:var(--navy); border-radius:10px; padding:9px 12px; font:inherit; font-size:.8rem; font-weight:750; cursor:pointer; transition: .15s ease; }
+  button:hover { border-color:var(--teal); background:#f0fbfa; }
+  button.primary { background:var(--navy); color:white; border-color:var(--navy); }
+  button.primary:hover { background:var(--navy-2); }
+  .bottom-grid { display:grid; grid-template-columns:1fr 1fr; gap:18px; margin-top:18px; }
+  .mini-stat { padding:13px 14px; border-radius:12px; background:var(--panel); border:1px solid #e8eef3; }
+  .mini-stat strong { display:block; font-size:1.05rem; color:var(--navy); }
+  .mini-stat span { color:var(--muted); font-size:.76rem; }
+  .footnote { color:var(--muted); font-size:.75rem; margin-top:16px; }
+  .footer { text-align:center; color:#8192a1; font-size:.74rem; padding:22px 0 0; }
+  @media (max-width: 800px) {
+    .layout, .bottom-grid { grid-template-columns:1fr; }
+    .app { padding:14px 12px 24px; }
+    .hero { padding:23px 20px; border-radius:17px; }
+    .card { padding:18px; }
+  }
+  @media print {
+    body { background:white; }
+    .app { max-width:none; padding:0; }
+    .hero, .card { box-shadow:none; }
+    button { display:none; }
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="hero">
+    <div class="eyebrow">Tata AMC · Strategy case prototype</div>
+    <h1>Customer Acquisition Funnel Calculator</h1>
+    <p>Translate campaign reach into estimated first-time mutual fund investors, then test the cost implications of different marketing assumptions.</p>
+    <div class="hero-tags">
+      <span class="tag">Interactive scenario planning</span>
+      <span class="tag">Digital + phygital channels</span>
+      <span class="tag">Illustrative assumptions only</span>
+    </div>
+  </header>
+
+  <main class="layout">
+    <section class="card">
+      <div class="section-title">
+        <div>
+          <h2>1. Adjust the assumptions</h2>
+          <div class="sub">Move any slider or select a scenario to update the model live.</div>
+        </div>
+        <span class="live"><span class="dot"></span> LIVE MODEL</span>
+      </div>
+
+      <div class="control">
+        <div class="control-head"><label for="reach">People reached</label><span class="value" id="reachVal">10,00,000</span></div>
+        <input id="reach" type="range" min="100000" max="5000000" step="100000" value="1000000" />
+        <div class="range-ends"><span>1 lakh</span><span>50 lakh</span></div>
+        <div class="hint">Unique people exposed to the campaign, after deduplication where possible.</div>
+      </div>
+      <div class="control">
+        <div class="control-head"><label for="engagement">Engagement rate</label><span class="value" id="engagementVal">10%</span></div>
+        <input id="engagement" type="range" min="1" max="30" step="1" value="10" />
+        <div class="range-ends"><span>1%</span><span>30%</span></div>
+        <div class="hint">Share of reached people who take a meaningful next step, such as clicking or viewing an explainer.</div>
+      </div>
+      <div class="control">
+        <div class="control-head"><label for="qualification">Engaged → qualified prospect</label><span class="value" id="qualificationVal">20%</span></div>
+        <input id="qualification" type="range" min="5" max="50" step="1" value="20" />
+        <div class="range-ends"><span>5%</span><span>50%</span></div>
+        <div class="hint">Share of engaged people who show intent and meet the pilot's prospect definition.</div>
+      </div>
+      <div class="control">
+        <div class="control-head"><label for="conversion">Qualified prospect → first investment</label><span class="value" id="conversionVal">25%</span></div>
+        <input id="conversion" type="range" min="5" max="50" step="1" value="25" />
+        <div class="range-ends"><span>5%</span><span>50%</span></div>
+        <div class="hint">Share of qualified prospects who complete a verified first mutual fund investment.</div>
+      </div>
+      <div class="control">
+        <div class="control-head"><label for="cac">Assumed acquisition cost per investor</label><span class="value" id="cacVal">₹300</span></div>
+        <input id="cac" type="range" min="50" max="1000" step="50" value="300" />
+        <div class="range-ends"><span>₹50</span><span>₹1,000</span></div>
+        <div class="hint">Illustrative fully loaded CAC assumption; replace with measured channel data.</div>
+      </div>
+
+      <div class="scenario-row">
+        <button type="button" class="primary" id="baseBtn">Base example</button>
+        <button type="button" id="digitalBtn">Digital-only scenario</button>
+        <button type="button" id="phygitalBtn">Digital + MFD scenario</button>
+        <button type="button" id="resetBtn">Reset</button>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="section-title">
+        <div>
+          <h2>2. Live results</h2>
+          <div class="sub">The figures recalculate instantly as assumptions change.</div>
+        </div>
+      </div>
+      <div class="results">
+        <div class="metric">
+          <div class="metric-label">Engaged audience</div>
+          <div class="metric-value" id="engagedOut">1,00,000</div>
+        </div>
+        <div class="metric">
+          <div class="metric-label">Qualified prospects</div>
+          <div class="metric-value" id="qualifiedOut">20,000</div>
+        </div>
+        <div class="metric featured">
+          <div class="metric-label">Estimated first-time investors</div>
+          <div class="metric-value" id="investorsOut">5,000</div>
+        </div>
+        <div class="metric">
+          <div class="metric-label">Estimated acquisition spend</div>
+          <div class="metric-value" id="spendOut">₹15,00,000</div>
+        </div>
+      </div>
+
+      <div class="funnel">
+        <h2>Conversion funnel</h2>
+        <div class="sub">Bar widths are relative to total reach.</div>
+        <div class="funnel-row">
+          <div class="funnel-head"><span>People reached</span><strong id="reachOut">10,00,000</strong></div>
+          <div class="bar-track"><div class="bar reach" id="reachBar"></div></div>
+        </div>
+        <div class="funnel-row">
+          <div class="funnel-head"><span>Engaged audience</span><strong id="engagedBarLabel">1,00,000 · 10%</strong></div>
+          <div class="bar-track"><div class="bar" id="engagedBar"></div></div>
+        </div>
+        <div class="funnel-row">
+          <div class="funnel-head"><span>Qualified prospects</span><strong id="qualifiedBarLabel">20,000 · 2% of reach</strong></div>
+          <div class="bar-track"><div class="bar qualified" id="qualifiedBar"></div></div>
+        </div>
+        <div class="funnel-row">
+          <div class="funnel-head"><span>First-time investors</span><strong id="investorsBarLabel">5,000 · 0.5% of reach</strong></div>
+          <div class="bar-track"><div class="bar investors" id="investorsBar"></div></div>
+        </div>
+      </div>
+      <div class="divider"></div>
+      <div class="insight" id="insight">At the current assumptions, the campaign estimates 5,000 first-time investors. At ₹300 CAC, the simplified acquisition-spend estimate is ₹15 lakh.</div>
+    </section>
+  </main>
+
+  <section class="bottom-grid">
+    <div class="card">
+      <h2>3. How to use this in the case</h2>
+      <div class="sub">A simple story to narrate while demonstrating the prototype.</div>
+      <ol style="padding-left:20px; margin:14px 0 0; color:#435a6c; font-size:.88rem;">
+        <li style="margin-bottom:8px;">Start with a campaign reach assumption.</li>
+        <li style="margin-bottom:8px;">Adjust engagement and qualification rates to show funnel leakage.</li>
+        <li style="margin-bottom:8px;">Compare digital-only with digital + MFD assumptions.</li>
+        <li>Use actual pilot results to decide which channel deserves more budget.</li>
+      </ol>
+    </div>
+    <div class="card">
+      <h2>4. Guardrails before scaling</h2>
+      <div class="sub">The calculator supports decisions; it does not replace evidence.</div>
+      <div class="mini-stat" style="margin-top:14px;"><strong>Unique investors</strong><span>Deduplicate and verify completed first investments.</span></div>
+      <div class="mini-stat" style="margin-top:9px;"><strong>Incremental CAC</strong><span>Measure incremental investors, not just clicks or attributed leads.</span></div>
+      <div class="mini-stat" style="margin-top:9px;"><strong>Quality & compliance</strong><span>Track retention, complaints, consent, disclosures and mis-selling signals.</span></div>
+    </div>
+  </section>
+
+  <p class="footnote"><strong>Important:</strong> All conversion rates and CAC values in this prototype are hypothetical examples, not Tata AMC actuals or validated forecasts. The simplified spend estimate equals estimated investors × assumed CAC. A real business case should use gross acquisitions, channel-specific fully loaded costs, duplicates, attribution, attrition and retention, and should be approved through a controlled pilot.</p>
+  <div class="footer">Prototype for case discussion · Not an official Tata Asset Management Company tool</div>
+</div>
+
+<script>
+  const ids = ["reach", "engagement", "qualification", "conversion", "cac"];
+  const byId = id => document.getElementById(id);
+  const numberIN = n => Math.round(n).toLocaleString("en-IN");
+  const rupeesIN = n => "₹" + Math.round(n).toLocaleString("en-IN");
+  const percent = n => (Math.round(n * 10) / 10).toLocaleString("en-IN") + "%";
+
+  function calculate() {
+    const reach = Number(byId("reach").value);
+    const engagement = Number(byId("engagement").value);
+    const qualification = Number(byId("qualification").value);
+    const conversion = Number(byId("conversion").value);
+    const cac = Number(byId("cac").value);
+
+    const engaged = Math.round(reach * engagement / 100);
+    const qualified = Math.round(engaged * qualification / 100);
+    const investors = Math.round(qualified * conversion / 100);
+    const spend = investors * cac;
+    const qualifiedPct = reach ? qualified / reach * 100 : 0;
+    const investorPct = reach ? investors / reach * 100 : 0;
+
+    byId("reachVal").textContent = numberIN(reach);
+    byId("engagementVal").textContent = engagement + "%";
+    byId("qualificationVal").textContent = qualification + "%";
+    byId("conversionVal").textContent = conversion + "%";
+    byId("cacVal").textContent = rupeesIN(cac);
+
+    byId("engagedOut").textContent = numberIN(engaged);
+    byId("qualifiedOut").textContent = numberIN(qualified);
+    byId("investorsOut").textContent = numberIN(investors);
+    byId("spendOut").textContent = rupeesIN(spend);
+
+    byId("reachOut").textContent = numberIN(reach);
+    byId("engagedBarLabel").textContent = numberIN(engaged) + " · " + percent(engaged / reach * 100);
+    byId("qualifiedBarLabel").textContent = numberIN(qualified) + " · " + percent(qualifiedPct) + " of reach";
+    byId("investorsBarLabel").textContent = numberIN(investors) + " · " + percent(investorPct) + " of reach";
+
+    byId("reachBar").style.width = "100%";
+    byId("engagedBar").style.width = Math.min(100, engaged / reach * 100) + "%";
+    byId("qualifiedBar").style.width = Math.min(100, qualified / reach * 100) + "%";
+    byId("investorsBar").style.width = Math.min(100, investors / reach * 100) + "%";
+
+    byId("insight").textContent =
+      "At the current assumptions, the campaign estimates " + numberIN(investors) +
+      " first-time investors. At " + rupeesIN(cac) +
+      " CAC, the simplified acquisition-spend estimate is " + rupeesIN(spend) +
+      ". These results should be validated in a controlled pilot.";
+  }
+
+  function setScenario(values) {
+    ids.forEach((id, i) => { byId(id).value = values[i]; });
+    calculate();
+  }
+
+  ids.forEach(id => byId(id).addEventListener("input", calculate));
+  byId("baseBtn").addEventListener("click", () => setScenario([1000000, 10, 20, 25, 300]));
+  byId("digitalBtn").addEventListener("click", () => setScenario([1000000, 12, 18, 18, 250]));
+  byId("phygitalBtn").addEventListener("click", () => setScenario([1000000, 10, 25, 32, 350]));
+  byId("resetBtn").addEventListener("click", () => setScenario([1000000, 10, 20, 25, 300]));
+  calculate();
+</script>
+</body>
+</html>
